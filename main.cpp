@@ -10,6 +10,9 @@
 #include <stdio.h>
 #include <iostream>
 #include <string>
+#include <mmsystem.h>  
+#pragma comment(lib, "winmm.lib") 
+
 
 //Game Speed
 int FPS = 50;
@@ -36,6 +39,7 @@ int car2 = +35;
 int lrIndex2 = 0;
 int car3 = +70;
 int lrIndex3 = 0;
+bool hornActivated = false;
 
 //For Display TEXT
 const int font1 = (int)GLUT_BITMAP_TIMES_ROMAN_24;
@@ -74,6 +78,12 @@ void tree(int x, int y)
 }
 
 /* Main Project URL: https://github.com/md-rubel/2D-Car-Game-OpenGL  */
+
+void playHorn() {
+    PlaySound("horn.wav", NULL, SND_ASYNC | SND_FILENAME);  // Play horn sound
+    hornActivated = true;
+}
+
 
 void startGame()
 {
@@ -237,10 +247,19 @@ void startGame()
     glEnd();
     car1--;
     if (car1 < -100)
-    {
-        car1 = 0;
-        lrIndex1 = lrIndex;
+{
+    car1 = 0;
+    lrIndex1 = lrIndex;
+
+    if (hornActivated) {
+        int randomLaneShift = (rand() % 3 - 1) * 15;  // -15, 0, or 15
+        lrIndex1 += randomLaneShift;
+        if (lrIndex1 < 0) lrIndex1 = 0;
+        if (lrIndex1 > 45) lrIndex1 = 45;
+        hornActivated = false;
     }
+}
+
     //Kill check car1
     if ((abs(lrIndex - lrIndex1) < 8) && (car1 + 100 < 10))
     {
@@ -276,10 +295,19 @@ void startGame()
     glEnd();
     car2--;
     if (car2 < -100)
-    {
-        car2 = 0;
-        lrIndex2 = lrIndex;
+{
+    car2 = 0;
+    lrIndex2 = lrIndex;
+
+    if (hornActivated) {
+        int randomLaneShift = (rand() % 3 - 1) * 15;
+        lrIndex2 += randomLaneShift;
+        if (lrIndex2 < 0) lrIndex2 = 0;
+        if (lrIndex2 > 45) lrIndex2 = 45;
+        hornActivated = false;
     }
+}
+
     //Kill check car2
     if ((abs(lrIndex - lrIndex2) < 8) && (car2 + 100 < 10))
     {
@@ -313,10 +341,19 @@ void startGame()
     glEnd();
     car3--;
     if (car3 < -100)
-    {
-        car3 = 0;
-        lrIndex3 = lrIndex;
+{
+    car3 = 0;
+    lrIndex3 = lrIndex;
+
+    if (hornActivated) {
+        int randomLaneShift = (rand() % 3 - 1) * 15;
+        lrIndex3 += randomLaneShift;
+        if (lrIndex3 < 0) lrIndex3 = 0;
+        if (lrIndex3 > 45) lrIndex3 = 45;
+        hornActivated = false;
     }
+}
+
     //Kill check car3
     if ((abs(lrIndex - lrIndex3) < 8) && (car3 + 100 < 10))
     {
@@ -554,7 +591,12 @@ void processKeys(unsigned char key, int x, int y)
         }
         break;
 
-    case 27:
+    case 'h':
+    case 'H':
+        playHorn();
+        break;
+   
+        case 27:
         exit(0);
         break;
     default:
